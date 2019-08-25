@@ -231,7 +231,7 @@ void  tokenise_space(char *str)
 	{
 		cd(tokens_space[1].arr,HOME);
 	}
-    else if(strcmp(tokens_space[0].arr,"pinfo")==0)
+    	else if(strcmp(tokens_space[0].arr,"pinfo")==0)
 	{
 		char * sad;
 		if(no_of_tokens_space==1)
@@ -316,7 +316,7 @@ void handler(int sig)
 
 	pid = wait(NULL);
 	if(pid>0)
-		fprintf(stderr," Emacs with Pid %d exited normally.\n", pid);
+		fprintf(stderr," \n Emacs with Pid %d exited normally.\n", pid);
 	//printf("Pid %d exited.\n", pid);
 }
 
@@ -326,30 +326,24 @@ void execute(char *a)
 	int k=0,var=0,status,m;
 	pid_t c_pid,wait_pid;
 	qwe=strtok(a, " ");
+	int check = 0;
 	//printf("%s\n",cpy);
 	while(qwe!=NULL)
 	{	
 		//strcpy(tokens_space[no_of_tokens_space].arr,temp);
-		args[k]=qwe;
+		if(strcmp(qwe,"&") != 0)
+		{
+			args[k]=qwe;
+			k++;
+			check = 1;
+		}	
 		qwe=strtok(NULL," ");
-		k++;
 	}
 	args[k]=NULL;
 	signal(SIGCHLD, handler);
 	c_pid = fork();
 	if(c_pid == 0)
 	{
-		m=0;
-		while(args[m])
-		{
-			if(!strcmp(args[m],"&"))
-			{
-				args[m] = NULL;
-				var=100;
-				break;
-			}
-			++m;
-		}
 		if(execvp(args[0],args)<0)
 		{
 			fprintf(stderr, "Error:'%s' cannot find command\n",args[0]);
@@ -357,17 +351,7 @@ void execute(char *a)
 	}
 	else if ( c_pid >0)
 	{
-		m=0;
-		while(args[m])
-		{
-			if(!strcmp(args[m],"&"))
-			{
-				var=100;
-				args[m] = NULL;
-			}
-			m++;
-		}
-		if(!var)
+		if(check == 0)
 		{
 			wait_pid = waitpid(c_pid,&status,0);
 		}
